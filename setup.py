@@ -26,6 +26,7 @@ extension_support = True  # Assume we are building C extensions.
 # Cython is not installed, we will fall back to using the pre-generated C files
 # (so long as we're running on CPython).
 try:
+    from Cython import __version__ as cython_version
     from Cython.Build import cythonize
     from Cython.Distutils import build_ext
     from Cython.Distutils.extension import Extension
@@ -37,6 +38,9 @@ else:
         warnings.warn('C extensions disabled as you are not using CPython.')
     else:
         cython_installed = True
+    if cython_installed and int(cython_version.split(".")[0]) >= 3:
+        warnings.warn('C extensions disabled as you are using an incompatible version of Cython.')
+        cython_installed = False
 
 if 'sdist' in sys.argv and not cython_installed:
     raise Exception('Building sdist requires that Cython be installed.')
